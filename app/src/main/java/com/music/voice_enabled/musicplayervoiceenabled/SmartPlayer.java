@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -15,7 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,6 +32,19 @@ public class SmartPlayer extends AppCompatActivity
     private Intent speechRecogniserIntent;
     private String keeper = "";
 
+    private ImageView pausePlayBtn , nextBtn , previousBtn;
+    private TextView audioNameTxt;
+
+    private ImageView imageView ;
+    private RelativeLayout lowerRelativeLayout ;
+    private Button voiceEnabledBtn;
+    private String mode = "ON";
+
+    private MediaPlayer mymediaPlayer;
+
+
+
+
 
 
 
@@ -38,6 +55,18 @@ public class SmartPlayer extends AppCompatActivity
         setContentView(R.layout.activity_smart_player);
 
         checkVoiceCommandPermission();
+
+        pausePlayBtn = findViewById(R.id.play_pause_btn);
+        nextBtn = findViewById(R.id.next_btn);
+        previousBtn = findViewById(R.id.previous_btn);
+        imageView = findViewById(R.id.logo);
+        lowerRelativeLayout = findViewById(R.id.lower);
+        voiceEnabledBtn = findViewById(R.id.VOICE_ENABLE_BUTTON);
+        audioNameTxt = findViewById(R.id.audioName);
+
+
+
+
 
         parentRelativeLayout = findViewById(R.id.parentRelativeLayout);
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(SmartPlayer.this);
@@ -121,6 +150,40 @@ public class SmartPlayer extends AppCompatActivity
 
             }
         });
+
+
+        voiceEnabledBtn.setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View v) {
+
+                if (mode.equals("ON"))
+                {
+                    mode = "OFF";
+                    voiceEnabledBtn.setText("Voice Mode - OFF");
+                    lowerRelativeLayout.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    mode = "ON";
+                    voiceEnabledBtn.setText("Voice Mode - ON");
+                    lowerRelativeLayout.setVisibility(View.GONE);
+                }
+
+
+
+
+            }
+        });
+
+
+
+
+
+
+
+
     }
 
     private  void  checkVoiceCommandPermission()
