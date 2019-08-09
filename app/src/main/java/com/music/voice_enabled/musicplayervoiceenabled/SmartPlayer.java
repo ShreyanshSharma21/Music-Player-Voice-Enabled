@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -41,6 +42,9 @@ public class SmartPlayer extends AppCompatActivity
     private String mode = "ON";
 
     private MediaPlayer mymediaPlayer;
+    private int position;
+    private ArrayList<File> myAudio;
+    private String myAudioName;
 
 
 
@@ -176,15 +180,34 @@ public class SmartPlayer extends AppCompatActivity
 
             }
         });
-
-
-
-
-
-
-
-
     }
+
+
+    private void validateReceivedValuesAndStartPlaying()
+    {
+        if (mymediaPlayer != null)
+        {
+            mymediaPlayer.stop();
+            mymediaPlayer.release();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private  void  checkVoiceCommandPermission()
     {
