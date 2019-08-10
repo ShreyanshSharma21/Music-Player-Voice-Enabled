@@ -17,7 +17,7 @@
         <ImageView
             android:id="@+id/logo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="270dp" />
         <TextView
             android:id="@+id/audioName"
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/colorAccent"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="7dp"
             android:singleLine="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee"

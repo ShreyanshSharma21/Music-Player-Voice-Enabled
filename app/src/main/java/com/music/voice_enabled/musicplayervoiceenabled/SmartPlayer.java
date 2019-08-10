@@ -78,6 +78,10 @@ public class SmartPlayer extends AppCompatActivity
         speechRecogniserIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechRecogniserIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
+        validateReceivedValuesAndStartPlaying();
+        imageView.setBackgroundResource(R.drawable.logo);
+
+
         speechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
             public void onReadyForSpeech(Bundle params) {
@@ -190,6 +194,23 @@ public class SmartPlayer extends AppCompatActivity
             mymediaPlayer.stop();
             mymediaPlayer.release();
         }
+
+        Intent intent = getIntent();
+
+        Bundle bundle = intent.getExtras();
+        myAudio = (ArrayList)bundle.getParcelableArrayList("Audio");
+        myAudioName = myAudio.get(position).getName();
+        String audioName = intent.getStringExtra("name");
+        startActivity(intent);
+        audioNameTxt .setText(audioName);
+        audioNameTxt.setSelected(true);
+        position = bundle.getInt("position", 0);
+        Uri uri = Uri.parse(myAudio.get(position).toString());
+
+        mymediaPlayer = MediaPlayer.create(SmartPlayer.this,uri);
+        mymediaPlayer.start();
+
+
     }
 
 
