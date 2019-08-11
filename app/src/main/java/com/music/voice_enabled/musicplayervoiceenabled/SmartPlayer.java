@@ -1,12 +1,17 @@
 package com.music.voice_enabled.musicplayervoiceenabled;
 
 import android.Manifest;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -14,6 +19,7 @@ import android.speech.SpeechRecognizer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -22,7 +28,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.music.voice_enabled.musicplayervoiceenabled.model.AudioModel;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -47,11 +56,6 @@ public class SmartPlayer extends AppCompatActivity
     private String myAudioName;
 
 
-
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -69,16 +73,17 @@ public class SmartPlayer extends AppCompatActivity
         audioNameTxt = findViewById(R.id.audioName);
 
 
-
-
-
         parentRelativeLayout = findViewById(R.id.parentRelativeLayout);
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(SmartPlayer.this);
         speechRecogniserIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechRecogniserIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechRecogniserIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
-        validateReceivedValuesAndStartPlaying();
+        try {
+            validateReceivedValuesAndStartPlaying();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         imageView.setBackgroundResource(R.drawable.logo);
 
 
@@ -121,7 +126,17 @@ public class SmartPlayer extends AppCompatActivity
                 if (matchesFound != null)
                 {
                     keeper = matchesFound.get(0);
-                    Toast.makeText(SmartPlayer.this,"Result =" + keeper, Toast.LENGTH_LONG).show();
+                    if (keeper.equals("pause the song") || keeper.equals("pause") || keeper.equals("stop") || keeper.equals("ruko"))
+                    {
+                        playPauseAudio();
+                        Toast.makeText(SmartPlayer.this,"Command" + keeper, Toast.LENGTH_LONG).show();
+                    }
+                    else if (keeper.equals("play the song") || keeper.equals("play") || keeper.equals("start") || keeper.equals("bajao"))
+                    {
+                        playPauseAudio();
+                        Toast.makeText(SmartPlayer.this,"Result =" + keeper, Toast.LENGTH_LONG).show();
+                    }
+
 
                 }
 
@@ -184,51 +199,42 @@ public class SmartPlayer extends AppCompatActivity
 
             }
         });
+
+        pausePlayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playPauseAudio();
+            }
+        });
     }
 
 
-    private void validateReceivedValuesAndStartPlaying()
-    {
+    private void validateReceivedValuesAndStartPlaying() throws IOException {
         if (mymediaPlayer != null)
         {
             mymediaPlayer.stop();
             mymediaPlayer.release();
         }
 
+//        Bundle bundle = intent.getExtras();
+//        myAudio = (ArrayList)bundle.getParcelableArrayList("Audio");
+//        myAudioName = myAudio.get(position).getName();
+//        String audioName = intent.getStringExtra("name");
+//        startActivity(intent);
+//        audioNameTxt .setText(audioName);
+//        audioNameTxt.setSelected(true);
+//        position = bundle.getInt("position", 0);
+//        Uri uri = Uri.parse(myAudio.get(position).toString());
+
         Intent intent = getIntent();
+        AudioModel model = (AudioModel) intent.getSerializableExtra("audio_info");
 
-        Bundle bundle = intent.getExtras();
-        myAudio = (ArrayList)bundle.getParcelableArrayList("Audio");
-        myAudioName = myAudio.get(position).getName();
-        String audioName = intent.getStringExtra("name");
-        startActivity(intent);
-        audioNameTxt .setText(audioName);
-        audioNameTxt.setSelected(true);
-        position = bundle.getInt("position", 0);
-        Uri uri = Uri.parse(myAudio.get(position).toString());
-
-        mymediaPlayer = MediaPlayer.create(SmartPlayer.this,uri);
+        mymediaPlayer = new MediaPlayer();
+        mymediaPlayer.reset();
+        mymediaPlayer.setDataSource(model.getName());
+        mymediaPlayer.prepare();
         mymediaPlayer.start();
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private  void  checkVoiceCommandPermission()
     {
@@ -246,4 +252,23 @@ public class SmartPlayer extends AppCompatActivity
             }
         }
     }
+
+    private  void playPauseAudio()
+    {
+        imageView.setBackgroundResource(R.drawable.four);
+        if (mymediaPlayer.isPlaying())
+        {
+            pausePlayBtn.setImageResource(R.drawable.pause);
+            mymediaPlayer.pause();
+        }
+        else
+        {
+            pausePlayBtn.setImageResource(R.drawable.play);
+            mymediaPlayer.start();
+
+            imageView.setBackgroundResource(R.drawable.five);
+        }
+
+    }
+
 }
